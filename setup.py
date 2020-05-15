@@ -12,7 +12,7 @@ setup(
     ),
     license="MIT",
     packages=find_packages(),
-    install_requires=["pynsot"],
+    install_requires=["pynsot", "sortedcontainers"],
     classifiers=[
         "Programming Language :: Python :: 3.5",
         "License :: OSI Approved :: MIT License",
