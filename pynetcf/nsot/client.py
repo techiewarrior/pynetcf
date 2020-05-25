@@ -23,6 +23,9 @@ def nsot_request(request_func):
     return wrapper
 
 
+RESOURCES = ("devices", "networks", "interfaces")
+
+
 class NSoTClient:
     """Manage NSoT API client"""
 
@@ -33,6 +36,18 @@ class NSoTClient:
     _sites_id_cache = {}
     _endpoints_cache = {}
     _default_site = None
+
+    _resource_cache = {}
+
+    @classmethod
+    def get_resource(cls, name):
+        if name not in RESOURCES:
+            raise ValueError("Invalud resource: %s" % name)
+        if cls._resource_cache.get(name) is None:
+            cls._resource_cache[name] = {
+                r["id"]: r for r in getattr(cls.resource, name).get()
+            }
+        return cls._resource_cache[name]
 
     @classmethod
     def check_sitename(cls, site_name):
@@ -82,23 +97,24 @@ class NSoTClient:
             raise ValueError("Site '%s' does not exists" % site_name)
         return site_id
 
-    # @classmethod
-    # def get_endpoint(cls, resource_name, site_name=None):
-    #     "Return the endpoint API of the given resource and site name"
-    #
-    #     if site_name is None:
-    #         site_id, site_name = cls.default_site()
-    #     else:
-    #         site_id = cls._sites.get(site_name)
-    #         if site_id is None:
-    #             raise ValueError("Site '%s' does not exists" % site_name)
-    #
-    #     key = "{}.{}".format(resource_name, site_name)
-    #     if cls._endpoints_cache.get(key) is None:
-    #         cls._endpoints_cache[key] = getattr(
-    #             cls.resource.sites(site_id), resource_name
-    #         )
-    #     return cls._endpoints_cache[key]
+    @classmethod
+    def get_endpoint(cls, resource_name, site_name):
+        "Return the endpoint API of the given resource and site name"
+
+        # if site_name is None:
+        #     site_id, site_name = cls.default_site()
+        # else:
+        #     site_id = cls._sites.get(site_name)
+        #     if site_id is None:
+        #         raise ValueError("Site '%s' does not exists" % site_name)
+
+        key = resource_name, site_name
+        if cls._endpoints_cache.get(key) is None:
+            site_id = cls.get_site_id(site_name)
+            cls._endpoints_cache[key] = getattr(
+                cls.resource.sites(site_id), resource_name
+            )
+        return cls._endpoints_cache[key]
 
     @classmethod
     def create_site(cls, site_name, description=None):

@@ -1,5 +1,5 @@
 from pynetcf.utils.logger import get_logger
-from ..client import NSoTClient, nsot_request
+from .client import NSoTClient, nsot_request
 
 
 CONSTRAINTS = ["pattern", "valid_values", "allow_empty"]

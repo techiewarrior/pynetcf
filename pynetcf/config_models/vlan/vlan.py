@@ -1,5 +1,3 @@
-import pynetcf.constants as C
-
 ATTRIBUTES = [
     ("name", None),
     ("tenant", "default"),

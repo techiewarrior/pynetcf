@@ -3,3 +3,6 @@ __pycache__
 *.egg
 *.egg-info
 *.bak*.py
+*.log
+test/
+bak/
